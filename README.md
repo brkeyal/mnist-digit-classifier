@@ -25,4 +25,22 @@ This Python application allows users to **train**, **save**, **load**, and **use
 ---
 
 ## Project Structure
+my_mnist_app/ │ ├── main.py # Entry point of the application ├── model.py # PyTorch model definitions ├── train_utils.py # Training utilities (data loading, training loop, etc.) ├── gui/ │ ├── train_gui.py # Tkinter GUI for training, saving, loading models │ └── draw_gui.py # Tkinter GUI for drawing and classifying digits │ ├── README.md # This file └── requirements.txt # Python dependencies (optional)
+
+
+
+---
+
+## Installation
+
+### Prerequisites
+
+- **Python 3.7+**: Ensure you have Python installed. You can download it from [python.org](https://www.python.org/downloads/).
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/my_mnist_app.git
+cd my_mnist_app
+
 
