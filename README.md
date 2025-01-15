@@ -52,8 +52,6 @@ source venv/bin/activate
 
 3. Install dependencies:
 ```bash
-pip install torch torchvision pillow
-# Or use requirements.txt
 pip install -r requirements.txt
 ```
 
