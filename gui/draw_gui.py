@@ -6,11 +6,13 @@ from PIL import Image, ImageDraw, ImageOps
 import torch
 import torch.nn.functional as F
 from torchvision import transforms
+import time
 
 class DrawGUI(tk.Toplevel):
-    def __init__(self, app):
+    def __init__(self, app, metrics):
         super().__init__()
         self.app = app
+        self.metrics = metrics
         self.title("Draw a Digit and Classify")
 
         self.canvas_size = 280  # 10x bigger than 28×28
@@ -61,28 +63,4 @@ class DrawGUI(tk.Toplevel):
         img = self.drawing_image.copy()
         # Resize
         img = img.resize((28, 28))
-        # Invert if needed (MNIST is typically white digit on black):
-        img = ImageOps.invert(img)
-
-        # Transform
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ])
-        tensor_img = transform(img).unsqueeze(0).to(self.app.device)
-
-        # Inference
-        self.app.model.eval()
-        with torch.no_grad():
-            logits = self.app.model(tensor_img)
-            probs = F.softmax(logits, dim=1)
-            pred_digit = probs.argmax(dim=1).item()
-
-        probability_str = ", ".join([f"{i}: {p:.2f}" for i, p in enumerate(probs.cpu().numpy()[0])])
-        self.result_label.config(
-            text=f"Predicted digit: {pred_digit}\nProbabilities:\n{probability_str}"
-        )
-
-    def clear_canvas(self):
-        self.canvas.delete("all")
-        self.draw.rectangle([0, 0, self.canvas_size, self.canvas_size], fill=255)
+        # Invert if ne

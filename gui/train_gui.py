@@ -10,13 +10,15 @@ from model import SimpleNN
 from train_utils import train_model
 
 class TrainGUI(tk.Frame):
-    def __init__(self, parent, app):
+    def __init__(self, parent, app, metrics):
         """
         parent: The parent widget (usually the main Tk object).
         app: Reference to the main application (MNISTApp).
+        metrics: Reference to MetricsLogger for logging metrics.
         """
         super().__init__(parent)
         self.app = app
+        self.metrics = metrics
         self.pack(fill=tk.BOTH, expand=True)
 
         # Labels
@@ -51,6 +53,10 @@ class TrainGUI(tk.Frame):
         self.progress_bar = ttk.Progressbar(self, orient="horizontal", length=200, mode="determinate")
         self.progress_bar.grid(row=5, column=0, columnspan=2, pady=10)
 
+        # Metrics Display
+        self.metrics_label = tk.Label(self, text="Training Time: N/A\nCPU Memory Used: N/A MB\nGPU Memory Used: N/A MB")
+        self.metrics_label.grid(row=6, column=0, columnspan=2, pady=10)
+
     def start_training(self):
         """
         Reads hyperparameters, starts a training thread, updates the GUI accordingly.
@@ -74,16 +80,28 @@ class TrainGUI(tk.Frame):
         self.progress_bar["maximum"] = epochs
 
         def train_thread():
-            def update_progress(epoch, total):
-                self.progress_bar["value"] = epoch
-
-            train_model(
+            # Call train_model and capture the returned metrics
+            metrics = train_model(
                 model=self.app.model,
                 device=self.app.device,
                 lr=lr,
                 batch_size=batch_size,
                 epochs=epochs,
-                progress_callback=update_progress
+                progress_callback=self.update_progress
+            )
+
+            # Log training metrics using MetricsLogger
+            self.metrics.log_training_metrics(
+                training_time=metrics['training_time'],
+                cpu_mem=metrics['cpu_memory_usage'],
+                gpu_mem=metrics['gpu_memory_usage']
+            )
+
+            # Update the metrics display in the GUI
+            self.metrics_label.config(
+                text=f"Training Time: {self.metrics.training_time:.2f} sec\n"
+                     f"CPU Memory Used: {self.metrics.cpu_memory_usage:.2f} MB\n"
+                     f"GPU Memory Used: {self.metrics.gpu_memory_usage:.2f} MB"
             )
 
             messagebox.showinfo("Info", "Training Complete!")
@@ -91,8 +109,12 @@ class TrainGUI(tk.Frame):
             self.save_button.config(state=tk.NORMAL)
             self.draw_button.config(state=tk.NORMAL)
 
-        # Run training in a background thread
+        # Run training in a background thread to keep the GUI responsive
         threading.Thread(target=train_thread, daemon=True).start()
+
+    def update_progress(self, epoch, total_epochs):
+        self.progress_bar["value"] = epoch
+        self.update_idletasks()
 
     def save_model(self):
         """
@@ -132,3 +154,5 @@ class TrainGUI(tk.Frame):
             messagebox.showinfo("Info", f"Model loaded from {file_path}")
             self.save_button.config(state=tk.NORMAL)
             self.draw_button.config(state=tk.NORMAL)
+
+            # Optionally, you can log or display metrics after loading
