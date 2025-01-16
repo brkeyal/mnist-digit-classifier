@@ -90,11 +90,14 @@ class TrainGUI(tk.Frame):
                 progress_callback=self.update_progress
             )
 
-            # Log training metrics using MetricsLogger
+            # Log training metrics using MetricsLogger, including hyperparameters
             self.metrics.log_training_metrics(
                 training_time=metrics['training_time'],
                 cpu_mem=metrics['cpu_memory_usage'],
-                gpu_mem=metrics['gpu_memory_usage']
+                gpu_mem=metrics['gpu_memory_usage'],
+                lr=lr,
+                batch_size=batch_size,
+                epochs=epochs
             )
 
             # Update the metrics display in the GUI

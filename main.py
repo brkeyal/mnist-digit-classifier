@@ -6,6 +6,8 @@ from gui.train_gui import TrainGUI
 from gui.draw_gui import DrawGUI
 import logging
 
+# main.py
+
 class MetricsLogger:
     def __init__(self):
         self.training_time = 0.0
@@ -20,13 +22,17 @@ class MetricsLogger:
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
 
-    def log_training_metrics(self, training_time, cpu_mem, gpu_mem):
+    def log_training_metrics(self, training_time, cpu_mem, gpu_mem, lr, batch_size, epochs):
         self.training_time = training_time
         self.cpu_memory_usage = cpu_mem
         self.gpu_memory_usage = gpu_mem
-        log_message = (f"Training Time: {self.training_time:.2f} sec, "
-                       f"CPU Memory Used: {self.cpu_memory_usage:.2f} MB, "
-                       f"GPU Memory Used: {self.gpu_memory_usage:.2f} MB")
+        log_message = (
+            f"Training Metrics - "
+            f"Learning Rate: {lr}, Batch Size: {batch_size}, Epochs: {epochs}, "
+            f"Training Time: {self.training_time:.2f} sec, "
+            f"CPU Memory Used: {self.cpu_memory_usage:.2f} MB, "
+            f"GPU Memory Used: {self.gpu_memory_usage:.2f} MB"
+        )
         print(f"[Metrics] {log_message}")
         logging.info(log_message)
 
